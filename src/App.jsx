@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import useDebounce from "./hooks/useDebounce";
 import './App.css';
@@ -15,35 +15,74 @@ const App =()=>{
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const searchImages= async (term)=>{
-    if (!term) return;
+  // For pagination:
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore]= useState(true); // To know if more images available
+
+  const searchImages= useCallback(async (term, pageNumber = 1)=>{
+    if (!term) {
+      setImages([]);
+      setHasMore(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const accessKey="P6H7-ISkyanXMyHsCHC5vmO37pn7HFk5hslnqHe1KOM";
 
       const res =await axios.get("https://api.unsplash.com/search/photos", {
-        params: {query: term,
-          per_page: 30
+        params: {
+          query: term,
+          page: pageNumber,
+          per_page: 30,
         },
 
         headers: {
           Authorization: `Client-ID ${accessKey}`,
         },
       });
-      console.log(res);
-      setImages(res.data.results);
+
+      if (pageNumber === 1){
+        setImages(res.data.results);
+      } else{
+        setImages(prev=>[...prev, ...res.data.results]);
+      }
+
+      // If returned results are less than requested per_page, no more pages
+      setHasMore(res.data.results.length === 30);
       
     } catch (err) {
       setError("Failed to fetch images. Please try again");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+   // When query changes, reset page to 1 and fetch new images
+   useEffect(()=>{
+    const handleScroll =()=>{
+     if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - 100 && !loading && hasMore
+    ) {setPage(prevPage => prevPage +1);} 
+    };
+    window.addEventListener("scroll", handleScroll);
+
+   return()=> window.removeEventListener("scroll",handleScroll);
+   }, [loading, hasMore]);
+
+   // Fetch next page when page changes (and page > 1)
 
   useEffect(()=>{
-    searchImages(debouncedQuery);
-  }, [debouncedQuery]);
+    if (page > 1){
+      searchImages(debouncedQuery, page);
+    } 
+  }, [page, debouncedQuery, searchImages]);
+
+  useEffect(()=>{
+    setPage(1);
+    searchImages(debouncedQuery, 1);
+  }, [debouncedQuery, searchImages]);
 
   const handleInputChange=(e)=>{
     const value = e.target.value;
