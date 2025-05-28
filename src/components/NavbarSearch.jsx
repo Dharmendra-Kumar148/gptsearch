@@ -8,7 +8,7 @@ const NavbarSearch = ({ query, handleInputChange }) => {
       {/* bg-dark: sets background color to dark */}
       {/* px-3: horizontal padding, mb-4: margin bottom */}
       <span className="navbar-brand mb-0 h1">
-        Search Image
+        Gallery
       </span>
       <form className="d-flex" onSubmit={(e) => e.preventDefault()}>
         <input

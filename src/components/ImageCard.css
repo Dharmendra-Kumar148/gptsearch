@@ -1,0 +1,22 @@
+.image-card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    margin-top: 10px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.image-card:hover {
+    transform: scale(1.03);
+}
+
+.image-card-img {
+    height: 250px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.image-card-body{
+    padding: 1rem
+}

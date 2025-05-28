@@ -14,6 +14,7 @@ const App =()=>{
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   // For pagination:
   const [page, setPage] = useState(1);
@@ -135,8 +136,9 @@ const App =()=>{
       <div className="row">
         {images.map((img)=>(
           <div className="col-md-4 col-sm-6">
-          <ImageCard key={img.id} image={img}/>
-          <div className="d-flex justify-content-center gap-2 mt-2">
+            <div className="card shadow-sm mb-4">
+              <ImageCard key={img.id} image={img} onImageClick={setSelectedImage} />
+          <div className="card-body d-flex justify-content-center gap-2 ">
 
             <button className="btn btn-sm btn-outline-primary" onClick={()=> downloadImage(img.urls.small, "small")}>Small</button>
 
@@ -144,9 +146,27 @@ const App =()=>{
 
             <button className="btn btn-sm btn-outline-danger" onClick={()=> downloadImage(img.urls.full, "large")}>Large</button>
           </div>
+            </div>
+          
           </div>
         ))}
       </div>
+
+      {/* Overlay Section */}
+      {selectedImage && (
+        <div className="overlay" onClick={(e)=> {
+          if (e.target.classList.contains("overlay")){setSelectedImage(null)}
+        }}>
+          <div className="overlay-content card shadow-lg">
+            <button className="close-btn btn btn-sm btn-danger" onClick={()=> setSelectedImage(null)}>✕</button>
+            <img key={searchImages.id} src={selectedImage.urls.regular} alt={selectedImage.alt_description} className="img-fluid" />
+            <div className="p-3">
+              <h5>{selectedImage.alt_description || "No Description"}</h5>
+              <p>By: {selectedImage.user.name}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
