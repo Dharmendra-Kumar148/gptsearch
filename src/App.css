@@ -33,6 +33,8 @@ body {
   border-radius: 50px;
 }
 
+
+
 @keyframes fadeIn {
   from {
     opacity: 0;

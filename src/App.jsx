@@ -4,6 +4,8 @@ import useDebounce from "./hooks/useDebounce";
 import './App.css';
 import ImageCard from "./components/ImageCard";
 import NavbarSearch from "./components/NavbarSearch";
+import { Route, Routes } from "react-router-dom";
+// import YouTube from "./pages/YouTube";
 
 const App =()=>{
   const [query, setQuery] = useState(()=>{
@@ -41,6 +43,7 @@ const App =()=>{
         headers: {
           Authorization: `Client-ID ${accessKey}`,
         },
+        
       });
 
       if (pageNumber === 1){
@@ -122,9 +125,12 @@ const App =()=>{
   };
   
   return(
-    <div className="container pt-5" style={{paddingTop:"80px"}}>
-      <NavbarSearch query={query} handleInputChange={handleInputChange}/>
+    <>
 
+      <NavbarSearch query={query} handleInputChange={handleInputChange}/>
+      <Routes>
+      <Route path="/" element={
+      <div className="container pt-6" style={{paddingTop:"80px"}}>
       {loading && <p className="text-info">Loading images...</p>}
       {error && (
         <p className="text-danger">{error}</p>
@@ -135,9 +141,9 @@ const App =()=>{
 
       <div className="row">
         {images.map((img)=>(
-          <div className="col-md-4 col-sm-6">
+          <div className="col-md-4 col-sm-6" key={img.id}>
             <div className="card shadow-sm mb-4">
-              <ImageCard key={img.id} image={img} onImageClick={setSelectedImage} />
+              <ImageCard  image={img} onImageClick={setSelectedImage} />
           <div className="card-body d-flex justify-content-center gap-2 ">
 
             <button className="btn btn-sm btn-outline-primary" onClick={()=> downloadImage(img.urls.small, "small")}>Small</button>
@@ -154,7 +160,7 @@ const App =()=>{
 
       {/* Overlay Section */}
       {selectedImage && (
-        <div className="overlay" onClick={(e)=> {
+        <div className="overlay pt-4" onClick={(e)=> {
           if (e.target.classList.contains("overlay")){setSelectedImage(null)}
         }}>
           <div className="overlay-content card shadow-lg">
@@ -168,6 +174,11 @@ const App =()=>{
         </div>
       )}
     </div>
+      }
+    />
+    {/* <Route path="/pages/youtube" element={<YouTube search={debouncedQuery} />} /> */}
+    </Routes>
+    </>
   );
 };
 
